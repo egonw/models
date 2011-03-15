@@ -21,3 +21,9 @@ while (hasNext(iter)) {
     print(name)
   }
 }
+
+yUnclean = compounds[
+  compounds[,c("CMAP_chemical_name")] %in% xNames,
+  c("CMAP_chemical_name", "Response_MCF7", "Response_PC3", "Response_HL60")
+]
+
