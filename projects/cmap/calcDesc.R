@@ -22,8 +22,6 @@ while (hasNext(iter)) {
   }
 }
 
-yUnclean = compounds[
-  compounds[,c("CMAP_chemical_name")] %in% xNames,
-  c("CMAP_chemical_name", "Response_MCF7", "Response_PC3", "Response_HL60")
-]
+write.csv(file="molDesc.csv", x)
+write.csv(file="molDescNames.csv", xNames)
 
