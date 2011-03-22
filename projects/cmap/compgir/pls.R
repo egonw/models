@@ -1,7 +1,9 @@
 library("pls")
 
+cellline = "PC3"
+
 x.raw = read.csv("../data/chemicals2components.csv")
-cell.select = x.raw[,"Cell.line"] == "PC3" 
+cell.select = x.raw[,"Cell.line"] == cellline
 
 duplicate = 166
 x = x.raw[cell.select, 4:103]
@@ -18,7 +20,7 @@ yUnclean = compounds[
   c("CMAP_chemical_name", "Response_MCF7", "Response_PC3", "Response_HL60")
 ]
 
-response = "Response_HL60"
+response = paste("Response_", cellline, sep="")
 y = yUnclean[,response]
 
 removeNADesc = function(x) {
@@ -40,8 +42,8 @@ y = y[ynaFilter]
 x = as.matrix(x)
 
 # all vars
-bestQ2 = 0.0
-for (i in 1:10) {
+bestQ2 = -1
+for (i in 1:5) {
   test.set = sample(nrow(x),21)
   train.x = x[-test.set,]
   train.y = y[-test.set]
