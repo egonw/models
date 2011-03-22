@@ -10,7 +10,7 @@ import org.openscience.cdk.signature.AtomSignature;
 fileName = "../data/CMAP_ALL_names.sdf"
 
 bits = new HashMap<String,Integer>();
-height = 1
+height = 2
 bitCount = 0;
 
 file = new File(fileName)

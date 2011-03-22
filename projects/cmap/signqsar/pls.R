@@ -3,7 +3,7 @@ source("signatures.R")
 
 cellline = "HL60"
 
-mat = signature.read.to.matrix('signatures.txt', size=209, header=TRUE)
+mat = signature.read.to.matrix('signatures.txt', size=4625, header=TRUE)
 x = mat
 xNames = read.csv("compoundNames.txt", sep="#")[,1]
 cat("dim(x): ", dim(x), "\n")
