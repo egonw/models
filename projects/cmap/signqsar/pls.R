@@ -14,7 +14,7 @@ compounds = compounds[-6,]
 y = compounds[1:223,
   c("Response_MCF7", "Response_PC3", "Response_HL60")
 ]
-yNames = compounds[1:223,c("CMAP_chemical_name")]
+yNames = compounds[1:223,c("ChemBank_ID")]
 cat("dim(y): ", dim(y), "\n")
 cat("length(yNames): ", length(yNames), "\n")
 
