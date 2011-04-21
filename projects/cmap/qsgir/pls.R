@@ -1,32 +1,32 @@
 library("pls")
 
-compounds = read.csv("Compounds.csv")
-names = compounds[1:224,c("CMAP_chemical_name")]
+# load descriptor data
+x = read.csv("../data/molDesc.csv")
+xNames = read.csv("../data/molDescNames.csv")[,2]
 
-x = read.csv("molDesc.csv")
-xNames = read.csv("molDescNames.csv")[,2]
+# load GI_50 values
+load("../data/GI50_20110415.RData")
+yUnclean = GI50[rownames(GI50) %in% xNames,]
 
-yUnclean = compounds[
-  compounds[,c("CMAP_chemical_name")] %in% xNames,
-  c("CMAP_chemical_name", "Response_MCF7", "Response_PC3", "Response_HL60")
-]
-yUnclean = yUnclean[-6,]
-
-response = "Response_HL60"
+# select cell line
+response = "HL60"
 y = yUnclean[,response]
 
+# remove descriptors which have NA values
 removeNADesc = function(x) {
   TRUE %in% is.na(x)
 }
 binaryFilter = apply(x, removeNADesc, MARGIN=2)
 x = x[,!binaryFilter]
 
+# remove descriptors which have only one value
 removeZero = function(x) {
   length(unique(x)) == 1
 }
 binaryFilter = apply(x, removeZero, MARGIN=2)
 x = x[,!binaryFilter]
 
+# remove molecules which have a NA y value
 ynaFilter = is.na(y) == FALSE
 x = x[ynaFilter,]
 y = y[ynaFilter]
@@ -36,7 +36,7 @@ x = as.matrix(x)
 # all vars
 bestQ2 = 0.0
 for (i in 1:5) {
-  test.set = sample(nrow(x),42)
+  test.set = sample(nrow(x),27)
   train.x = x[-test.set,]
   train.y = y[-test.set]
   test.x = x[test.set,]
