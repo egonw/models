@@ -41,7 +41,7 @@ for (i in 1:5) {
   train.y = y[-test.set]
   test.x = x[test.set,]
   test.y = y[test.set]
-  xyf.map = xyf(train.x, train.y, grid = somgrid(5, 5, "hexagonal"), rlen=500)
+  xyf.map = xyf(train.x, train.y, grid = somgrid(6, 6, "hexagonal"), rlen=500)
   xyf.prediction.train = predict(xyf.map, newdata=train.x)
   predicted.train.y = xyf.prediction.train$prediction
   xyf.prediction = predict(xyf.map, newdata=test.x)
