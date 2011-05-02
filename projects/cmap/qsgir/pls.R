@@ -8,9 +8,20 @@ xNames = read.csv("../data/molDescNames.csv")[,2]
 load("../data/GI50_20110415.RData")
 yUnclean = GI50[rownames(GI50) %in% xNames,]
 
-# select cell line
-response = "HL60"
-y = yUnclean[,response]
+# select cell line MCF7, PC3, HL60
+#response = "HL60"
+#y = yUnclean[,response]
+
+# take the mean GI_50 over all cell lines
+y = apply(yUnclean, 1,  function(x) mean(x, na.rm=TRUE))
+
+# remove molecules which have a NA x value
+xnaFilter = !apply(x, 1, function(x) any(is.na(x)))
+x = x[xnaFilter,]
+y = y[xnaFilter]
+
+print(dim(x))
+print(length(y))
 
 # remove descriptors which have NA values
 removeNADesc = function(x) {
@@ -31,12 +42,21 @@ ynaFilter = is.na(y) == FALSE
 x = x[ynaFilter,]
 y = y[ynaFilter]
 
+# remove all molecules with a GI_50 of -4.0
+ynaFilter = which(y == -4.0)
+x = x[-ynaFilter,]
+y = y[-ynaFilter]
+
+
 x = as.matrix(x)
+
+print(dim(x))
+print(length(y))
 
 # all vars
 bestQ2 = 0.0
 for (i in 1:5) {
-  test.set = sample(nrow(x),27)
+  test.set = sample(nrow(x),ceiling(length(y)/10)) # ~25% test set
   train.x = x[-test.set,]
   train.y = y[-test.set]
   test.x = x[test.set,]
@@ -65,18 +85,18 @@ for (i in 1:5) {
             "     Q2=", round(Q2, digit=3),
             "  RMSEP=", round(RMSEP, digit=3), "\n", sep=""));
   save.image(file=paste("model.", i, ".RData", sep=""))
+  plot(pls.model, plottype="coeff", ncomp=lv)
+  dev.print(file=paste("plsmodel.", i, ".coeff.ps", sep=""), width=6, height=6)
   plot(pls.model, plottype="prediction", ncomp=lv, main=response)
   points(bestPLS.testy, bestPLS.predy, col="red")
   abline(0,1)
   dev.print(file=paste("plsmodel.", i, ".prediction.ps", sep=""), width=6, height=6)
-  plot(pls.model, plottype="coeff", ncomp=lv)
-  dev.print(file=paste("plsmodel.", i, ".coeff.ps", sep=""), width=6, height=6)
 }
 save(bestPLS.model, file="bestPLSModel.Rdata")
+plot(bestPLS.model, plottype="coeff", type="l")
+dev.print(file="bestPLSModel.regression.ps", width=6, height=6)
 plot(bestPLS.model, plottype="prediction", ncomp=lv)
 points(bestPLS.testy, bestPLS.predy, col="red")
 abline(0,1)
 dev.print(file=paste("bestPLSModel.prediction.ps", sep=""), width=6, height=6)
-plot(bestPLS.model, plottype="coeff", type="l")
-dev.print(file="bestPLSModel.regression.ps", width=6, height=6)
 
