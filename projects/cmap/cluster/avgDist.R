@@ -25,3 +25,7 @@ clustering = hclust(as.dist(fp.dist), method="complete")
 plot(clustering, hang=-1)
 identified = identify(clustering)
 view.molecule.2d(smallMols[identified[[1]]])
+
+png(filename="histSimilarities.png")
+hist(sim.matrix, main="Compound Similarities", xlab="Tanimoto similarities")
+dev.off()
