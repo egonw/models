@@ -10,33 +10,34 @@ yAll = apply(GI50, 1,  function(x) mean(x, na.rm=TRUE))
 mols <- load.molecules(c("../data/CMAP_ALL_names.sdf"))
 print(paste("number of molecules: ", length(mols)))
 
-smallMols = c()
-
-y = c()
-for (mol in mols) {
-  name <- get.property(mol, "cdk:Title")
-  if (name %in% names) {
-    smallMols = c(smallMols, mol)
-    y = c(y, yAll[name])
+load("top20_chems_for_comps_20110915.RData")
+for (i in 1:length(top20)) {
+  names = top20[[i]]
+  
+  smallMols = c()
+  y = c()
+  for (mol in mols) {
+    name <- get.property(mol, "cdk:Title")
+    if (name %in% names) {
+      smallMols = c(smallMols, mol)
+      y = c(y, yAll[name])
+    }
   }
-}
-print(paste("number of molecules: ", length(smallMols)))
-fps <- lapply(smallMols, get.fingerprint, type = "extended")
-fp.sim <- fp.sim.matrix(fps, method = "tanimoto")
-fp.dist <- 1 - fp.sim
+  print(paste("number of molecules: ", length(smallMols)))
+  fps <- lapply(smallMols, get.fingerprint, type = "extended")
+  fp.sim <- fp.sim.matrix(fps, method = "tanimoto")
+  fp.dist <- 1 - fp.sim
 
-clustering = hclust(
-  as.dist(fp.dist), method="complete"
-)
-plot(clustering, hang=-1,
-  main="Clusters of CMAP compounds",
-  xlab="Compounds", sub="", labels=rep("", length(smallMols))
-)
-abline(h=0.5, col="red")
-hist(
-  as.dist(fp.dist), breaks=50, xlab="Tanimoto Distance",
-  main="Frequency of Tanimoto Distances", sub=""
-)
+  clustering = hclust(
+    as.dist(fp.dist), method="complete"
+  )
+  hist(
+    as.dist(fp.dist), breaks=50, xlab="Tanimoto Distance",
+    main="Frequency of Tanimoto Distances",
+    sub=paste("Component", names(top20)[i])
+  )
+} 
+  
 text(0.10,400, "Few similar\nmolecules", col="red")
 text(0.6,1200, "Most are\ndissimilar", col="red")
 memb <- cutree(clustering, h=0.5)

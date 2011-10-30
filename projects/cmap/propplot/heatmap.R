@@ -1,4 +1,5 @@
-#options(java.parameters = c("-Xmx4000m"))
+source("http://www.bioconductor.org/biocLite.R")
+biocLite("ALL")
 source("../rdf/cbmMols.R")
 source("../../cdkpropdist/plot.propDist.R")
 
@@ -30,24 +31,14 @@ smallMols = mols[which(molNames %in% names)]
 print(paste("number of molecules:", length(smallMols)))
 smallNames = unlist(lapply(smallMols, get.title))
 
-chemInGroups = read.csv("Chemicals_in_Groups_20110919.csv")
+# select some interesting genes
 
-classa = which(smallNames %in% chemInGroups[chemInGroups[,"Group"] == "A","Chemical"])
-classb = which(smallNames %in% chemInGroups[chemInGroups[,"Group"] == "B","Chemical"])
-classc = which(smallNames %in% chemInGroups[chemInGroups[,"Group"] == "C","Chemical"])
-classd = which(smallNames %in% chemInGroups[chemInGroups[,"Group"] == "D","Chemical"])
-#previously:
-#toxic = which(smallNames %in% names(pc3[pc3[,"PC3"] < -5,]))
-#nontoxic = which(smallNames %in% names(pc3[pc3[,"PC3"] >= -5,]))
-all = 1:length(mols)
+load("/home/egonw/data/data/cmap/xpression.3062.RData")
 
-plot.propdist(
-  mols,
-  selections=list(classa, classb, classc, classd, all),
-  plotColors=c("red", "green", "yellow", "orange", "black"),
-  descriptor="org.openscience.cdk.qsar.descriptors.molecular.WeightDescriptor",
-  main="", xlab="Molecular Weight",
-  ylab="Relative Distribution"
-)
+diffexpr180 = differential.expression.3062[unlist(lapply(smallNames, FUN = function(x) { sample(which(rownames(differential.expression.3062) == x),1) } )),]
+# saved as file
 
+pvals = apply(diffexpr180, MARGIN=2, function(x) {t.test(x[steroids],x[-steroids])$p.value} )
+interesting.probes = which(pvals<0.05)
 
+heatmap(diffexpr180[steroids,interesting.probes], labCol=rep("",length(pvals)))
